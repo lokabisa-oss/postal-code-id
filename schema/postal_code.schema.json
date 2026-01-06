@@ -1,0 +1,26 @@
+{
+  "type": "object",
+  "required": ["postal_code", "village_code", "source"],
+  "properties": {
+    "postal_code": {
+      "type": "string",
+      "pattern": "^[0-9]{5}$"
+    },
+    "village_code": {
+      "type": "string",
+      "description": "Kemendagri village code, must exist in region-id"
+    },
+    "source": {
+      "type": "string",
+      "enum": ["OPENDATA_JABAR"]
+    },
+    "confidence": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "year": {
+      "type": "integer"
+    }
+  }
+}
