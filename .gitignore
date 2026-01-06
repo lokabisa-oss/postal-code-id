@@ -1,0 +1,33 @@
+# -------------------------------------------------
+# Input datasets (fetched externally)
+# -------------------------------------------------
+regions_id.csv
+dispusipda-kode_pos_kab_kota_indonesia_data.csv
+
+# -------------------------------------------------
+# Build outputs (distributed via GitHub Releases)
+# -------------------------------------------------
+postal_codes.csv
+postal_codes.json
+
+# Optional future artifacts
+*.sha256
+*.checksum
+
+# -------------------------------------------------
+# Python artifacts
+# -------------------------------------------------
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+.env
+
+# -------------------------------------------------
+# OS / Editor
+# -------------------------------------------------
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
