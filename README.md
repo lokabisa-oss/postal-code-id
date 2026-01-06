@@ -14,7 +14,8 @@ Linked to Indonesian administrative regions (region-id)
   - postal_codes.csv
   - postal_codes.json
 
-➡️ Download from the GitHub Releases page.
+🔗 Release page:  
+https://github.com/lokabisa-oss/postal-code-id/releases/tag/v2025Q1
 
 ## Data Schema
 
