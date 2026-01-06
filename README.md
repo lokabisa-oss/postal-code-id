@@ -8,8 +8,8 @@ Linked to Indonesian administrative regions (region-id)
 - Version: v2025Q1
 - Coverage:
   - 100% of region-id villages are represented
-  - 99.38% have official postal codes
-  - 0.62% are augmented using public postal lookup signals
+  - 84.21% have official postal codes (Open Data Jawa Barat, 2023)
+  - 15.79% are marked as UNASSIGNED
 - Downloads:
   - postal_codes.csv
   - postal_codes.json
