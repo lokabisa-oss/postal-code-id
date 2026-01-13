@@ -1,3 +1,23 @@
+<p align="center">
+  <img
+    src="https://raw.githubusercontent.com/lokabisa-oss/postal-code-id/main/metadata/og-postal-code-id.png"
+    alt="postal-code-id — Indonesian Postal Code Dataset"
+    width="100%"
+  />
+</p>
+
+<p align="center">
+  <a href="https://github.com/lokabisa-oss/postal-code-id/releases">
+    <img src="https://img.shields.io/github/v/release/lokabisa-oss/postal-code-id?style=flat-square" />
+  </a>
+  <a href="https://github.com/lokabisa-oss/postal-code-id">
+    <img src="https://img.shields.io/github/repo-size/lokabisa-oss/postal-code-id?style=flat-square" />
+  </a>
+  <a href="https://github.com/lokabisa-oss/postal-code-id/blob/main/LICENSE">
+    <img src="https://img.shields.io/github/license/lokabisa-oss/postal-code-id?style=flat-square" />
+  </a>
+</p>
+
 # postal-code-id
 
 Indonesian Postal Code Dataset  
