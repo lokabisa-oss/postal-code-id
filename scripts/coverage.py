@@ -1,6 +1,7 @@
 import argparse
 import json
-from datetime import datetime
+from datetime import datetime, timezone
+datetime.now(timezone.utc).isoformat()
 
 from postal_code_id_ingester.ingest.region_id_loader import (
     load_villages_from_region_id
@@ -38,6 +39,7 @@ def main():
     # Load ground truth
     villages = load_villages_from_region_id(args.regions)
     total = len(villages)
+    print(f"Total villages in ground truth: {total}")
 
     # Load processed village_codes
     seen = load_seen_village_codes(args.output)
@@ -68,6 +70,7 @@ def main():
                     {
                         "village_code": v.village_code,
                         "village": v.village,
+                        "district_code": v.district_code,
                         "district": v.district,
                         "city": v.city,
                         "province": v.province,
