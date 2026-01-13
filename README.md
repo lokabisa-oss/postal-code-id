@@ -57,7 +57,7 @@ sourced from Open Data Jawa Barat (2023).
   - `postal_codes.json`
 
 🔗 Release page:  
-https://github.com/lokabisa-oss/postal-code-id/releases/tag/v2025Q1
+https://github.com/lokabisa-oss/postal-code-id/releases/tag/v2026Q1
 
 ---
 
