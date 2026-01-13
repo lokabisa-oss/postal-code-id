@@ -7,8 +7,15 @@ dispusipda-kode_pos_kab_kota_indonesia_data.csv
 # -------------------------------------------------
 # Build outputs (distributed via GitHub Releases)
 # -------------------------------------------------
-postal_codes.csv
-postal_codes.json
+postal_codes_opendata_jabar.csv
+postal_codes_opendata_jabar.json
+
+postal_codes_pos_indonesia.csv
+postal_codes_pos_indonesia_enriched.csv
+postal_codes_pos_indonesia.json
+
+failed_villages_opendata_jabar.jsonl
+failed_villages_pos_indonesia.jsonl
 
 # Optional future artifacts
 *.sha256
@@ -32,3 +39,6 @@ __pycache__/
 Thumbs.db
 .vscode/
 .idea/
+
+# Pos Indonesia ingest (non-reproducible)
+data/sources/kodepos-posindonesia-co-id/village_postal_codes.jsonl
