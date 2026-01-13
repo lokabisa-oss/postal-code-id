@@ -1,10 +1,10 @@
 # Build Specification – postal-code-id
 
 This document defines how releases of the **postal-code-id** dataset
-are produced in a deterministic and reproducible manner.
+are produced in a deterministic, auditable, and reproducible manner.
 
 This repository distributes **dataset releases**, not source code.
-Any implementation (scripts, tools) must conform to the rules
+Any implementation (scripts, tools, pipelines) MUST conform to the rules
 defined in this document.
 
 ---
@@ -14,100 +14,160 @@ defined in this document.
 - Ensure dataset releases are reproducible
 - Make data lineage explicit and auditable
 - Separate **methodology** from **distribution**
+- Clearly distinguish authoritative references from augmentation signals
+
+---
+
+## Release Types
+
+postal-code-id produces **two distinct release types**, each with
+explicitly defined inputs and guarantees.
+
+### 1️⃣ Baseline Release (Open Data Jawa Barat)
+
+Characteristics:
+
+- Coverage: < 100%
+- Source of postal codes: Open Data Jawa Barat (2023)
+- Status values:
+  - `OFFICIAL`
+  - `UNASSIGNED`
+
+Purpose:
+
+- Provide a conservative, publishable baseline
+- Avoid inference or augmentation
+- Preserve original data semantics
+
+---
+
+### 2️⃣ Derived Full-Coverage Release (region-id + Pos Indonesia)
+
+Characteristics:
+
+- Coverage: **100% of region-id villages**
+- Ground truth: `region-id`
+- Postal code signal: Pos Indonesia ingestion output
+- Status values:
+  - `OFFICIAL`
+  - `AUGMENTED`
+
+Purpose:
+
+- Provide a complete, practical reference dataset
+- Preserve transparency by explicitly labeling augmentation
+- Never replace authoritative sources
 
 ---
 
 ## Input Sources
 
-### 1. Open Data Jawa Barat – Postal Code Dataset (Baseline)
+### 1. region-id (Administrative Reference)
+
+- Repository: https://github.com/lokabisa-oss/region-id
+- Release: **v1.0.1** (pinned)
+- Artifact:
+  - `regions_id.csv` (GitHub Release asset)
+
+Role:
+
+- **Authoritative source** for administrative data:
+  - `province_code`, `province_name`
+  - `regency_code`, `regency_name`, `regency_type`
+  - `district_code`, `district_name`
+  - `village_code`, `village_name`, `village_type`
+- Defines the **complete and fixed set of villages**
+- Sole reference for:
+  - coverage calculation
+  - village identifiers
+  - village names and types
+
+Constraints:
+
+- Administrative data MUST NOT be sourced from any other repository,
+  API, or dataset.
+- Repository source trees or branches MUST NOT be used.
+- Only the pinned release artifact is allowed.
+
+---
+
+### 2. Open Data Jawa Barat – Postal Code Dataset (Baseline)
 
 - Repository: https://github.com/lokabisa-oss/id-documents
 - Path: `opendata-jabar/postal-code/2023`
-- Reference: `opendata-jabar-postal-code-2023`
-- Integrity: Verified via `SHA256SUMS`
+- Reference: pinned commit or tag
+- Integrity: verified via `SHA256SUMS`
 
 Role:
 
 - Primary baseline for **OFFICIAL** postal code mappings
-- Non-authoritative but publishable open data
+- Non-authoritative but redistributable open data
+- Used in both Baseline and Derived releases
 
 ---
 
-### 2. region-id (Administrative Reference)
-
-- Repository: https://github.com/lokabisa-oss/region-id
-- Reference: pinned release (e.g. `v2025Q1`)
-
-Role:
-
-- Authoritative source for:
-  - village identifiers (`village_code`)
-  - village names
-  - village types (`village`, `urban_village`)
-- Defines the full set of villages that must be represented
-
----
-
-### 3. Pos Indonesia Public Postal Lookup (Augmentation Signal)
+### 3. Pos Indonesia Public Postal Lookup (Ingestion Signal)
 
 - Access method: public web lookup
-- Data used: postal code only
-- Redistribution: **not allowed**
+- Consumed artifact:
+  - JSONL ingestion output (e.g. `village_postal_codes.jsonl`)
+- Data used:
+  - postal code only
+- Redistribution: **NOT allowed** (raw responses)
 
 Role:
 
 - Signal-only source for **AUGMENTED** mappings
-- Used solely to improve coverage completeness
+- Used exclusively to fill missing postal codes
 - Never treated as authoritative
+- Never used as an administrative reference
+
+Important constraints:
+
+- Pos Indonesia data MUST be applied **only by `village_code`**
+- No name-based, district-based, or city-based inference is allowed
+- Administrative attributes MUST always come from `regions_id.csv`
 
 Reproducibility note:
 
-- Results may change over time
-- Augmented mappings must always be explicitly labeled
+- Ingestion results may change over time
+- Derived releases MUST explicitly label augmentation
 
 ---
 
 ## Build Rules
 
-### 1. Coverage Rule
+### 1. Coverage Rule (Global)
 
 - Exactly **one output record** MUST exist for every village in `region-id`
 - Output coverage MUST be 100% of region-id villages
 
 ---
 
-### 2. region-id (Administrative Reference)
+### 2. OFFICIAL Mapping Rule
 
-- Repository: https://github.com/lokabisa-oss/region-id
-- Release: v1.0.0
-- URL: https://github.com/lokabisa-oss/region-id/releases/tag/v1.0.0
+A village is classified as `OFFICIAL` if:
 
-Artifacts used:
+- A postal code exists in Open Data Jawa Barat
+- The village exists in `regions_id.csv`
 
-- `regions_id.csv` (GitHub Release asset)
+Output constraints:
 
-Role:
-
-- Authoritative source for administrative identifiers and attributes
-- Provides a flattened snapshot of:
-  - province
-  - regency
-  - district
-  - village
-- Defines the complete and fixed set of villages used for:
-  - coverage calculation
-  - village identifiers (`village_code`)
-  - village names
-  - village types (`village`, `urban_village`)
+- `status = OFFICIAL`
+- `source = OPENDATA_JABAR`
+- `confidence = 0.7`
+- `year = 2023`
+- Administrative fields MUST come from `regions_id.csv`
 
 ---
 
-### 3. AUGMENTED Mapping Rule
+### 3. AUGMENTED Mapping Rule (Derived Release Only)
 
 A village is classified as `AUGMENTED` if:
 
-- It does not have an OFFICIAL mapping
-- A postal code is found via Pos Indonesia lookup
+- It does NOT have an OFFICIAL mapping
+- A postal code exists in the Pos Indonesia ingestion output
+  for the same `village_code`
 
 Output constraints:
 
@@ -115,20 +175,20 @@ Output constraints:
 - `source = POSINDONESIA_SCRAPE`
 - `confidence = 0.3 – 0.6`
 - `year = build year`
-- `village_name` and `village_type` MUST be sourced from `region-id`
+- Administrative fields MUST come from `regions_id.csv`
 
 Notes:
 
-- Augmented mappings are **non-authoritative**
-- Augmented mappings MUST NOT override OFFICIAL mappings
+- AUGMENTED mappings are **non-authoritative**
+- AUGMENTED mappings MUST NOT override OFFICIAL mappings
 
 ---
 
-### 4. UNASSIGNED Mapping Rule
+### 4. UNASSIGNED Mapping Rule (Baseline Release Only)
 
 A village is classified as `UNASSIGNED` if:
 
-- No OFFICIAL or AUGMENTED postal code is available
+- No OFFICIAL postal code is available
 
 Output constraints:
 
@@ -137,7 +197,7 @@ Output constraints:
 - `source = NONE`
 - `confidence = 0.0`
 - `year = build year`
-- `village_name` and `village_type` MUST be sourced from `region-id`
+- Administrative fields MUST come from `regions_id.csv`
 
 ---
 
@@ -166,17 +226,14 @@ Each release MUST produce:
 
 To ensure reproducibility:
 
-- Input source references MUST be pinned
-- Output records MUST be sorted by `village_code` ascending
+- All input references MUST be pinned
+- Output records MUST be sorted by `village_code` (ascending)
 - No random or non-deterministic operations are allowed
 - Confidence values MUST follow defined ranges
-- Coverage calculations are based exclusively on
-  region-id release v1.0.0 and MUST NOT change
-  unless the pinned reference is updated.
-- Administrative data MUST be consumed exclusively from the
-  `regions_id.csv` release artifact of region-id v1.0.0.
-- Repository source trees or branch contents MUST NOT be used
-  for administrative references.
+- Coverage calculations MUST be based exclusively on
+  `region-id` release v1.0.0
+- Administrative data MUST be consumed exclusively from
+  `regions_id.csv`
 
 ---
 
@@ -198,6 +255,7 @@ This build process explicitly does NOT aim to:
 - Replace Pos Indonesia as an authoritative source
 - Provide real-time postal code resolution
 - Infer postal codes without explicit labeling
+- Perform probabilistic or ML-based inference
 
 ---
 
@@ -207,4 +265,5 @@ A dataset release is considered valid if:
 
 - All villages in `region-id` are represented
 - All records conform to the schema
-- All sources and rules used are traceable to this document
+- All mappings are explicitly labeled
+- All sources and rules are traceable to this document

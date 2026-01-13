@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": [
+    "village_code",
+    "village_name",
+    "village_type",
+    "source",
+    "confidence",
+    "year",
+    "status"
+  ],
+  "properties": {
+    "postal_code": {
+      "type": ["string", "null"],
+      "pattern": "^[0-9]{5}$",
+      "description": "Postal code. May be null for UNASSIGNED villages."
+    },
+    "village_code": {
+      "type": "string",
+      "description": "Kemendagri village code. Must exist in region-id."
+    },
+    "village_name": {
+      "type": "string",
+      "description": "Village name snapshot aligned with region-id."
+    },
+    "village_type": {
+      "type": "string",
+      "enum": ["village", "urban_village"],
+      "description": "Village type aligned with region-id."
+    },
+    "source": {
+      "type": "string",
+      "enum": ["OPENDATA_JABAR", "POSINDONESIA_SCRAPE", "NONE"],
+      "description": "Primary source of the postal code signal."
+    },
+    "confidence": {
+      "type": "number",
+      "minimum": 0.0,
+      "maximum": 1.0,
+      "description": "Confidence score of the postal code mapping."
+    },
+    "year": {
+      "type": "integer",
+      "description": "Reference year of the postal code data."
+    },
+    "status": {
+      "type": "string",
+      "enum": ["OFFICIAL", "AUGMENTED", "UNASSIGNED"],
+      "description": "Mapping status of the postal code."
+    }
+  },
+  "additionalProperties": false
+}
