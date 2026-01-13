@@ -1,7 +1,7 @@
 {
   "total_villages": 83762,
-  "matched": 81782,
-  "missing": 1980,
-  "coverage_percent": 97.64,
-  "generated_at": "2026-01-11T03:00:14.572138Z"
+  "matched": 83762,
+  "missing": 0,
+  "coverage_percent": 100.0,
+  "generated_at": "2026-01-11T22:21:41.547372Z"
 }
